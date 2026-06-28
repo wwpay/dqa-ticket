@@ -50,7 +50,7 @@ const I18N = {
     status_done_opt: '완료',
     status_hold_opt: '보류',
     status_na: 'N/A',
-    btn_wjira_link: '바로가기',
+    btn_wjira_link: 'WJIRA 바로가기',
     btn_clone: '복제',
     badge_retest: '재테스트',
     placeholder_version: '버전',
