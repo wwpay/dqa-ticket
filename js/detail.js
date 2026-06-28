@@ -57,12 +57,13 @@ document.addEventListener('DOMContentLoaded', async () => {
     titleInput.focus();
   });
 
-  document.getElementById('btn-save-top').addEventListener('click', handleSave);
+  // 저장 후 목록으로 / 저장 후 계속 등록
+  document.getElementById('btn-save-top').addEventListener('click',      () => handleSave(false));
+  document.getElementById('btn-save-continue').addEventListener('click', () => handleSave(true));
   const navigateToList = () => { resetDirty(); pendingFiles = []; location.href = 'index.html'; };
   document.getElementById('btn-cancel-top').addEventListener('click', () => { if (confirmLeave()) navigateToList(); });
   document.getElementById('btn-back').addEventListener('click',       () => { if (confirmLeave()) navigateToList(); });
   document.getElementById('btn-delete').addEventListener('click', handleDelete);
-  document.getElementById('btn-clone').addEventListener('click', handleClone);
 
   // 폼 변경 감지
   document.getElementById('ticket-form').addEventListener('input',  markDirty);
@@ -89,6 +90,8 @@ async function initNewMode() {
   document.getElementById('ticket-id-edit-wrap').style.display = '';
   document.getElementById('ticket-id-static').style.display = 'none';
   document.getElementById('created-date').textContent = formatDate(new Date());
+  // 신규 모드에서만 "저장 후 계속 등록" 버튼 표시
+  document.getElementById('btn-save-continue').style.display = '';
 
   // 신규 모드에서도 활성 티켓 수 기반으로 옵션 생성, 버전 목록도 함께 로드
   try {
@@ -146,7 +149,6 @@ async function loadTicket(rowId) {
     fillForm(currentTicket);
     renderVersionSelect(currentTicket.version_id || '');
     document.getElementById('btn-delete').style.display = '';
-    document.getElementById('btn-clone').style.display = '';
   } catch (err) {
     alert(err.message);
     location.href = 'index.html';
@@ -442,42 +444,6 @@ function renderFileList() {
 
 // ─── 삭제 ─────────────────────────────────────────────────────────────────────
 
-// ─── 복제 ─────────────────────────────────────────────────────────────────────
-
-async function handleClone() {
-  if (!currentTicket) return;
-  const confirmed = confirm(`[${currentTicket.ticket_id}] 티켓을 복제하여 재테스트 항목을 만드시겠습니까?`);
-  if (!confirmed) return;
-
-  const overlay = document.getElementById('detail-loading');
-  const text    = overlay && overlay.querySelector('.detail-loading-text');
-  if (overlay) overlay.style.display = 'flex';
-  if (text)    text.textContent = '복제 중...';
-
-  try {
-    const result = await addTicket({
-      ticket_id:     currentTicket.ticket_id,
-      title:         currentTicket.title,
-      check_version: currentTicket.check_version,
-      assignee:      currentTicket.assignee,
-      priority:      '',
-      status:        '진행전',
-      verdict:       '',
-      check_content: currentTicket.check_content,
-      note:          currentTicket.note,
-      wjira_updated: '',
-      file_urls:     '',
-      retest_ref:    currentTicket.ticket_id,
-      version_id:    currentTicket.version_id || ''
-    });
-    resetDirty();
-    location.href = 'detail.html?id=' + result.row_id;
-  } catch (err) {
-    if (overlay) overlay.style.display = 'none';
-    alert('복제에 실패했습니다: ' + err.message);
-  }
-}
-
 function setDeletingState(deleting) {
   const overlay = document.getElementById('detail-loading');
   const text    = overlay && overlay.querySelector('.detail-loading-text');
@@ -521,7 +487,8 @@ window.addEventListener('beforeunload', e => {
   }
 });
 
-async function handleSave() {
+// continueAfterSave: true → 폼 초기화 후 계속 등록, false → 목록으로 이동
+async function handleSave(continueAfterSave = false) {
   if (isSaving) return;
 
   setSavingState(true);
@@ -539,11 +506,14 @@ async function handleSave() {
       renderFileList();
     }
 
+    let savedFormData = null;
+
     if (isNewMode) {
       const numPart = document.getElementById('ticket-id-num').value.trim();
-      if (!numPart) { alert('티켓번호를 입력하세요.'); return; }
+      if (!numPart) { alert('티켓번호를 입력하세요.'); setSavingState(false); return; }
       const ticketId = 'XAX2-' + numPart;
-      await addTicket({ ticket_id: ticketId, version_id: currentVersionId, ...collectFormData() });
+      savedFormData = collectFormData();
+      await addTicket({ ticket_id: ticketId, version_id: currentVersionId, ...savedFormData });
     } else {
       await updateTicket({ row_id: currentTicket.row_id, ...collectFormData() });
     }
@@ -556,10 +526,53 @@ async function handleSave() {
 
     resetDirty();
     setSavingState(false);
+
+    if (continueAfterSave && isNewMode && savedFormData) {
+      // 저장 후 계속 등록: 폼 초기화 + 실시순서 +1
+      resetFormForContinue(savedFormData);
+    } else {
+      // 저장 후 목록으로
+      location.href = 'index.html';
+    }
   } catch (err) {
     alert(t('save_error') + '\n' + err.message);
     setSavingState(false);
   }
+}
+
+// 저장 후 계속 등록: 폼 초기화 + 실시순서 자동 +1 (추가 API 호출 없음)
+function resetFormForContinue(savedFormData) {
+  // cachedAllTickets에 방금 저장한 티켓의 priority를 반영하여 다음 순서 계산
+  if (cachedAllTickets && savedFormData.priority) {
+    const isMVN = savedFormData.assignee === 'MVN';
+    const arr   = isMVN ? cachedAllTickets.activeMVN : cachedAllTickets.activeWW;
+    arr.push({ priority: savedFormData.priority, assignee: savedFormData.assignee, row_id: '__saved__' });
+  }
+  const activeAll = [...(cachedAllTickets?.activeWW ?? []), ...(cachedAllTickets?.activeMVN ?? [])];
+  const maxPri    = activeAll.reduce((m, tk) => Math.max(m, Number(tk.priority) || 0), 0);
+  const nextPri   = String(maxPri + 1);
+
+  // 티켓번호·이슈명·확인버전·결과·확인내용·비고·파일 초기화
+  document.getElementById('ticket-id-num').value = '';
+  document.getElementById('title-input').value   = '';
+  document.getElementById('btn-clear-title').style.display = 'none';
+  document.querySelectorAll('.version-input').forEach(inp => { inp.value = ''; });
+  document.getElementById('verdict').value        = '';
+  document.getElementById('status').value         = '진행전';
+  document.getElementById('check-content').value  = '';
+  document.getElementById('note').value           = '';
+  document.getElementById('wjira-updated').checked = false;
+  uploadedFiles   = [];
+  pendingFiles    = [];
+  removedFileUrls = [];
+  renderFileList();
+
+  // 담당자·버전은 그대로 유지, 실시순서만 +1로 갱신
+  updatePriorityState();
+  populatePriorityOptions(nextPri);
+
+  resetDirty();
+  document.getElementById('ticket-id-num').focus();
 }
 
 function collectFormData() {
