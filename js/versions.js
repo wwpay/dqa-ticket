@@ -1,3 +1,4 @@
+// 수정: 2026-06-28 10:00 — API 1회 호출(getTickets)로 버전+티켓 동시 취득
 // 버전 목록과 티켓 수를 담는 상태
 let versionList = [];      // sort_order 기준 정렬 유지
 let ticketCounts = {};     // { version_id: count }
@@ -50,11 +51,9 @@ document.addEventListener('DOMContentLoaded', async () => {
 async function loadData() {
   showLoading(true);
   try {
-    // 버전 목록과 전체 티켓을 병렬로 가져옴
-    const [vers, allTickets] = await Promise.all([
-      getVersions(),
-      getTickets()
-    ]);
+    // 티켓과 버전 목록을 1회 API 호출로 동시 취득
+    const allTickets = await getTickets();
+    const vers = allTickets.versions || [];
 
     // versionList는 항상 sort_order 기준 유지 (드래그 순서 이동을 위해)
     versionList   = vers;

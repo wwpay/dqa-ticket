@@ -1,3 +1,4 @@
+// 수정: 2026-06-28 10:00 — API 1회 호출로 통합, 초기 로딩 오버레이 즉시 표시
 function escHtml(s) {
   return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
@@ -95,13 +96,16 @@ async function initNewMode() {
 
   // 신규 모드에서도 활성 티켓 수 기반으로 옵션 생성, 버전 목록도 함께 로드
   try {
-    [cachedAllTickets, allVersions] = await Promise.all([getTickets(), getVersions()]);
+    cachedAllTickets = await getTickets();
+    allVersions = cachedAllTickets.versions || [];
   } catch (_) {}
   renderVersionSelect(currentVersionId);
   const activeAll  = [...(cachedAllTickets?.activeWW ?? []), ...(cachedAllTickets?.activeMVN ?? [])];
   const maxPri     = activeAll.reduce((m, tk) => Math.max(m, Number(tk.priority) || 0), 0);
   const defaultPri = String(maxPri + 1);
   populatePriorityOptions(defaultPri);
+  // 데이터 로드 완료 후 로딩 오버레이 제거
+  document.getElementById('detail-loading').style.display = 'none';
 
   // 바로가기: 번호 입력 시 활성화
   const numInput = document.getElementById('ticket-id-num');
@@ -140,9 +144,8 @@ async function loadTicket(rowId) {
   document.getElementById('page-title').textContent = t('page_title_edit');
   document.getElementById('detail-loading').style.display = 'flex';
   try {
-    const [data, vers] = await Promise.all([getTickets(), getVersions()]);
-    cachedAllTickets = data;
-    allVersions = vers;
+    cachedAllTickets = await getTickets();
+    allVersions = cachedAllTickets.versions || [];
     const all = [...data.activeWW, ...data.activeMVN, ...data.done, ...data.hold];
     currentTicket = all.find(tk => tk.row_id === rowId);
     if (!currentTicket) throw new Error('티켓을 찾을 수 없습니다: ' + rowId);

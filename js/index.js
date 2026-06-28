@@ -1,3 +1,4 @@
+// 수정: 2026-06-28 10:00 — loadVersions 제거, loadTickets에서 versions 포함 처리
 // 티켓 데이터 캐시
 let allTickets = { activeWW: [], activeMVN: [], done: [], hold: [] };
 let searchQuery = '';
@@ -21,7 +22,6 @@ document.addEventListener('DOMContentLoaded', async () => {
   // 마지막 선택 버전 복원
   currentVersionId = localStorage.getItem('dqa_current_version') || ALL_VERSION;
 
-  await loadVersions();
   await loadTickets();
 
   document.getElementById('btn-new').addEventListener('click', () => {
@@ -112,6 +112,12 @@ async function loadTickets() {
   try {
     const vid = currentVersionId === ALL_VERSION ? '' : currentVersionId;
     allTickets = await getTickets(vid);
+    versions = allTickets.versions || [];
+    // 저장된 선택 버전이 더 이상 존재하지 않으면 전체로 복귀
+    if (currentVersionId !== ALL_VERSION && !versions.some(v => v.version_id === currentVersionId)) {
+      currentVersionId = ALL_VERSION;
+    }
+    renderSidebar();
     populateDynamicFilters();
     renderAll();
   } catch (err) {
@@ -122,20 +128,6 @@ async function loadTickets() {
 }
 
 // ─── 버전 사이드탭 ────────────────────────────────────────────────────────────
-
-async function loadVersions() {
-  try {
-    versions = await getVersions();
-  } catch (err) {
-    console.error('버전 목록 로드 실패:', err);
-    versions = [];
-  }
-  // 저장된 선택 버전이 더 이상 존재하지 않으면 전체로 복귀
-  if (currentVersionId !== ALL_VERSION && !versions.some(v => v.version_id === currentVersionId)) {
-    currentVersionId = ALL_VERSION;
-  }
-  renderSidebar();
-}
 
 function renderSidebar() {
   const list = document.getElementById('version-list');

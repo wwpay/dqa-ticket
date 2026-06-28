@@ -1,3 +1,4 @@
+// 수정: 2026-06-28 10:00 — getTickets() versions 포함 반환, getVersions() 별도 호출 불필요
 const GAS_URL = 'https://script.google.com/macros/s/AKfycbzzUsXwJ4oOrX63HmSyScYRtzCnpUD5shGTRwwxfwg1KX_UfVdpoflcex6vvdvnlrZc0A/exec';
 
 // POST 공통 함수 — URLSearchParams로 form-encoded 전송
@@ -17,14 +18,14 @@ async function callGAS(type, params = {}) {
   return json;
 }
 
-// 전체 티켓 조회 (doGet) — versionId 주면 해당 버전 티켓만
+// 전체 티켓 조회 (doGet) — versionId 주면 해당 버전 티켓만 / versions도 함께 반환
 async function getTickets(versionId) {
   const url = versionId ? `${GAS_URL}?version_id=${encodeURIComponent(versionId)}` : GAS_URL;
   const res = await fetch(url, { redirect: 'follow' });
   if (!res.ok) throw new Error('HTTP ' + res.status);
   const json = await res.json();
   if (!json.success) throw new Error(json.error || '알 수 없는 오류');
-  return json.data;
+  return { ...(json.data || {}), versions: json.versions || [] };
 }
 
 // 버전 목록 조회

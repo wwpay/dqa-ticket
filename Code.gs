@@ -1,3 +1,4 @@
+// 수정: 2026-06-28 10:00 — doGet에 versions 포함, API 호출 2회→1회 감소
 // ─── Column indices (0-based for array access) ───────────────────────────────
 const COL = {
   TICKET_ID:         0,  // A
@@ -117,7 +118,13 @@ function doGet(e) {
     const data  = sheet.getDataRange().getValues();
     const empty = { activeWW: [], activeMVN: [], done: [], hold: [] };
 
-    if (data.length <= 1) return jsonResponse({ success: true, data: empty });
+    // versions 시트도 함께 반환 (API 호출 2회→1회 감소)
+    const vSheet   = getVersionSheet();
+    const vData    = vSheet.getDataRange().getValues();
+    const versions = vData.length <= 1 ? [] :
+      vData.slice(1).map(versionRowToObj).filter(v => v.version_id !== '').sort((a, b) => a.sort_order - b.sort_order);
+
+    if (data.length <= 1) return jsonResponse({ success: true, data: empty, versions });
 
     // version_id 파라미터가 있으면 해당 버전 티켓만 (없으면 전체 — 하위 호환)
     const versionId = e && e.parameter ? e.parameter.version_id : '';
@@ -151,7 +158,7 @@ function doGet(e) {
     done.sort(byChangedDesc);
     hold.sort(byChangedDesc);
 
-    return jsonResponse({ success: true, data: { activeWW, activeMVN, done, hold } });
+    return jsonResponse({ success: true, data: { activeWW, activeMVN, done, hold }, versions });
 
   } catch (err) {
     return jsonResponse({ success: false, error: err.message });

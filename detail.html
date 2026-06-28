@@ -1,6 +1,9 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
+<!--
+  수정: 2026-06-28 10:00 — 로딩 오버레이 즉시 표시, 버전+티켓 1회 API 호출로 개선
+-->
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>DQA Ticket Manager</title>
@@ -45,7 +48,7 @@
 </div>
 
 <!-- ─── 로딩 오버레이 ───────────────────────────────────────────────────── -->
-<div id="detail-loading" class="detail-loading-overlay" style="display:none">
+<div id="detail-loading" class="detail-loading-overlay" style="display:flex">
   <div class="spinner"></div>
   <span class="detail-loading-text" data-i18n="loading">로딩 중...</span>
 </div>
