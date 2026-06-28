@@ -1,3 +1,4 @@
+// 수정: 2026-06-28 15:20 — 수정 모드에서 WJIRA 바로가기 버튼 숨기기
 // 수정: 2026-06-28 14:00 — 실시순서 Rule1(그룹+버전 max+1), Rule4(연속 cascade, 저장 시 함께 반영)
 // 수정: 2026-06-28 10:00 — API 1회 호출로 통합, 초기 로딩 오버레이 즉시 표시
 function escHtml(s) {
@@ -244,12 +245,8 @@ function fillForm(ticket) {
   staticEl.style.display = '';
   staticEl.innerHTML = `<a href="https://wjira.humaxdigital.com/browse/${ticket.ticket_id}" target="_blank">${ticket.ticket_id}</a>`;
 
-  // 바로가기 버튼 활성화
-  const linkBtn = document.getElementById('btn-wjira-link');
-  linkBtn.disabled = false;
-  linkBtn.addEventListener('click', () => {
-    window.open('https://wjira.humaxdigital.com/browse/' + ticket.ticket_id, '_blank');
-  });
+  // 수정 모드에서 바로가기 버튼 숨기기 (티켓번호가 링크로 표시되므로 불필요)
+  document.getElementById('btn-wjira-link').style.display = 'none';
 
   document.getElementById('title-input').value = ticket.title;
   if (ticket.title) document.getElementById('btn-clear-title').style.display = '';
