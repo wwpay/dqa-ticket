@@ -1,3 +1,4 @@
+/* 수정: 2026-06-28 20:00 — WJIRA 헤더 물음표 아이콘(.th-help-icon, .th-row) 추가 */
 /* 수정: 2026-06-28 19:30 — 헤더 필터 뱃지 UI (.th-content/.th-filter-badge/.th-filter-clear) */
 /* 수정: 2026-06-28 19:00 — 그룹헤더 mid 배경, 섹션별 th 색상 계열 연동, 보류&N/A */
 /* 수정: 2026-06-28 18:30 — DnD 드래그핸들 CSS 제거 (.drag-handle/.draggable-row/.priority-num) */
@@ -267,6 +268,33 @@ body {
   pointer-events: none;
 }
 .th-filter-wrap.active .th-filter-label { font-weight: 700; }
+
+/* 필터 래퍼 + 아이콘을 가로로 나란히 배치 */
+.th-row {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+/* 빨간 물음표 아이콘: select 오버레이 바깥에 위치해 hover 가능 */
+.th-help-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: #ef4444;
+  color: #fff;
+  font-size: 9px;
+  font-weight: 700;
+  line-height: 1;
+  cursor: default;
+  flex-shrink: 0;
+  font-style: normal;
+  text-transform: none;
+  letter-spacing: 0;
+}
 
 /* 필터 th 내부 컨테이너: 컬럼명 + 뱃지를 세로로 쌓음 */
 .th-content {

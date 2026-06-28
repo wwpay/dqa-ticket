@@ -1,3 +1,4 @@
+// 수정: 2026-06-28 20:00 — WJIRA 헤더 레이블 → 'WJIRA' + 빨간 물음표 아이콘(툴팁)
 // 수정: 2026-06-28 19:30 — 헤더 필터 뱃지 버그 수정: 컬럼명 항상 유지, 활성 필터는 × 뱃지 표시
 // 수정: 2026-06-28 14:00 — 실시순서 Rule4: 같은 그룹+버전 필터, 연속된 번호만 cascade (빈칸에서 중지)
 // 수정: 2026-06-28 10:00 — loadVersions 제거, loadTickets에서 versions 포함 처리
@@ -100,18 +101,21 @@ function buildHeaderHtml(sectionType = 'active') {
     : `<option value="진행중"${sel('status','진행중')}>${statusLabel('진행중')}</option><option value="진행전"${sel('status','진행전')}>${statusLabel('진행전')}</option><option value="재테스트"${sel('status','재테스트')}>${statusLabel('재테스트')}</option>`;
 
   // 컬럼명은 항상 유지, 활성 필터는 하단 뱃지(× 포함)로 표시
-  const wrap = (key, label, inner, displayVal) => {
+  // iconHtml: 필터 텍스트 우측에 추가 아이콘 (th-filter-wrap 바깥 → select 오버레이 밖에 위치)
+  const wrap = (key, label, inner, displayVal, iconHtml = '') => {
     const active = !!f[key];
     const badgeText = escHtml(displayVal || f[key]);
     const badge = active
       ? `<span class="th-filter-badge"><span class="th-badge-text">${badgeText}</span>` +
         `<button class="th-filter-clear" data-filter-key="${key}" type="button">×</button></span>`
       : '';
-    return `<span class="th-content">` +
-      `<span class="th-filter-wrap${active ? ' active' : ''}">` +
+    const filterWrap = `<span class="th-filter-wrap${active ? ' active' : ''}">` +
       `<span class="th-filter-label">${label}</span>` +
       `<select class="th-filter-select" data-filter-key="${key}">${inner}</select>` +
-      `</span>${badge}</span>`;
+      `</span>`;
+    // 아이콘이 있으면 필터 래퍼와 나란히 배치
+    const topRow = iconHtml ? `<span class="th-row">${filterWrap}${iconHtml}</span>` : filterWrap;
+    return `<span class="th-content">${topRow}${badge}</span>`;
   };
 
   return `
@@ -123,7 +127,7 @@ function buildHeaderHtml(sectionType = 'active') {
     <th>${wrap('assignee', t('col_assignee'), `<option value=""></option>`)}</th>
     <th>${wrap('status', t('col_status'), `<option value=""></option>${statusOpts}`, f.status ? statusLabel(f.status) : '')}</th>
     <th>${wrap('verdict', t('col_verdict'), `<option value=""></option><option value="OK"${sel('verdict','OK')}>OK</option><option value="NG"${sel('verdict','NG')}>NG</option>`)}</th>
-    <th>${wrap('wjira', 'WJIRA 결과기재', `<option value=""></option><option value="OK"${sel('wjira','OK')}>기재완료</option><option value="none"${sel('wjira','none')}>미기재</option>`, f.wjira === 'OK' ? '기재완료' : f.wjira === 'none' ? '미기재' : '')}</th>
+    <th>${wrap('wjira', 'WJIRA', `<option value=""></option><option value="OK"${sel('wjira','OK')}>기재완료</option><option value="none"${sel('wjira','none')}>미기재</option>`, f.wjira === 'OK' ? '기재완료' : f.wjira === 'none' ? '미기재' : '', '<span class="th-help-icon" title="WJIRA 결과 기재">?</span>')}</th>
   `;
 }
 
