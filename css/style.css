@@ -798,13 +798,15 @@ body {
 #check-content { min-height: 100px; }
 #note          { min-height: 60px; }
 
-/* 티켓번호 입력 + 바로가기 버튼 행 */
+/* 티켓번호 행 */
 .ticket-id-row {
   display: flex;
   align-items: center;
   gap: 8px;
 }
+/* 신규/수정 모드 모두 입력란이 1fr 칸 전체를 채우도록 */
 .ticket-id-row .static-value { flex: 1; }
+.ticket-id-wrap { flex: 1; }
 
 /* 티켓번호 접두사 + 숫자 입력 */
 .ticket-id-wrap {

@@ -1,3 +1,4 @@
+// 수정: 2026-06-28 17:00 — btn-wjira-link 완전 제거 (HTML/JS), ticket-id-wrap flex:1
 // 수정: 2026-06-28 16:00 — 실시순서 readonly input으로 변경 (목록 DnD 전용)
 // 수정: 2026-06-28 15:20 — 수정 모드에서 WJIRA 바로가기 버튼 숨기기
 // 수정: 2026-06-28 14:00 — 실시순서 Rule1(그룹+버전 max+1), Rule4(연속 cascade, 저장 시 함께 반영)
@@ -112,17 +113,6 @@ async function initNewMode() {
   assigneeEl.addEventListener('change', refreshPrioritySuggestion);
   // 데이터 로드 완료 후 로딩 오버레이 제거
   document.getElementById('detail-loading').style.display = 'none';
-
-  // 바로가기: 번호 입력 시 활성화
-  const numInput = document.getElementById('ticket-id-num');
-  const linkBtn  = document.getElementById('btn-wjira-link');
-  numInput.addEventListener('input', () => {
-    linkBtn.disabled = !numInput.value.trim();
-  });
-  linkBtn.addEventListener('click', () => {
-    const num = numInput.value.trim();
-    if (num) window.open('https://wjira.humaxdigital.com/browse/XAX2-' + num, '_blank');
-  });
 
   // btn-fetch는 숨겨두되 함수는 유지
   document.getElementById('btn-fetch').addEventListener('click', async () => {
@@ -244,9 +234,6 @@ function fillForm(ticket) {
   const staticEl = document.getElementById('ticket-id-static');
   staticEl.style.display = '';
   staticEl.innerHTML = `<a href="https://wjira.humaxdigital.com/browse/${ticket.ticket_id}" target="_blank">${ticket.ticket_id}</a>`;
-
-  // 수정 모드에서 바로가기 버튼 숨기기 (티켓번호가 링크로 표시되므로 불필요)
-  document.getElementById('btn-wjira-link').style.display = 'none';
 
   document.getElementById('title-input').value = ticket.title;
   if (ticket.title) document.getElementById('btn-clear-title').style.display = '';

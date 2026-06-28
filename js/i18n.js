@@ -1,3 +1,4 @@
+// 수정: 2026-06-28 17:00 — 베트남어 placeholder_check_content 누락분 수정
 // 수정: 2026-06-28 16:00 — WJIRA 바로가기 → 티켓 바로 가기 (4개 언어)
 // 수정: 2026-06-28 15:20 — 확인내용 → 확인결과 (4개 언어)
 // 다국어 번역 테이블
@@ -251,7 +252,7 @@ const I18N = {
     btn_clone: 'Nhân bản',
     badge_retest: 'Kiểm tra lại',
     placeholder_version: 'Phiên bản',
-    placeholder_check_content: 'Nhập nội dung kiểm tra',
+    placeholder_check_content: 'Nhập kết quả kiểm tra',
     placeholder_note: 'Nhập ghi chú',
     version_all: 'Tất cả',
     btn_add_version: '+ Phiên bản mới',
