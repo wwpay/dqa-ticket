@@ -1122,6 +1122,23 @@ body {
 .ver-table tr:last-child td { border-bottom: none; }
 .ver-table tr:hover td { background: #fafbfc; }
 
+/* 정렬 가능한 헤더 */
+.ver-th-sortable {
+  cursor: pointer;
+  user-select: none;
+}
+.ver-th-sortable:hover {
+  color: var(--text);
+  background: #f0f4f8;
+}
+.ver-th-sortable.ver-th-active {
+  color: var(--fill-accent);
+}
+.ver-sort-icon {
+  font-size: 10px;
+  margin-left: 2px;
+}
+
 .ver-order-cell {
   text-align: center;
   white-space: nowrap;

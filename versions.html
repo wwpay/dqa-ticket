@@ -24,9 +24,10 @@
   </div>
 </header>
 
-<!-- ─── 로딩 오버레이 ───────────────────────────────────────────────────── -->
-<div id="loading" class="loading-overlay" style="display:none">
+<!-- ─── 로딩 오버레이 (전체 화면, 스피너 + 텍스트) ──────────────────────── -->
+<div id="loading" class="detail-loading-overlay" style="display:none">
   <div class="spinner"></div>
+  <span class="detail-loading-text">불러오는 중...</span>
 </div>
 
 <!-- ─── 메인 ────────────────────────────────────────────────────────────── -->
@@ -39,9 +40,9 @@
       <table class="ver-table" id="ver-table">
         <thead>
           <tr>
-            <th>버전명</th>
-            <th style="width:80px">티켓 수</th>
-            <th style="width:110px">생성일</th>
+            <th class="ver-th-sortable" data-col="name">버전명<span class="ver-sort-icon"></span></th>
+            <th class="ver-th-sortable" data-col="count" style="width:80px">티켓 수<span class="ver-sort-icon"></span></th>
+            <th class="ver-th-sortable" data-col="date" style="width:110px">생성일<span class="ver-sort-icon"></span></th>
             <th style="width:160px">작업</th>
             <th style="width:80px">순서</th>
           </tr>
