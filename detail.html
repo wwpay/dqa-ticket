@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
 <!--
-  수정: 2026-06-28 14:20 — Row1 래퍼 제거, outer 3단 그리드에 직접 배치 (확인버전 컬럼과 정렬)
+  수정: 2026-06-28 15:00 — 전체 레이아웃 리디자인: 단일 카드, 메타 3단, 3단 그리드, 하단 버튼 제거
 -->
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -55,141 +55,159 @@
 
 <!-- ─── 폼 ──────────────────────────────────────────────────────────────── -->
 <main class="detail-main">
-  <form id="ticket-form" class="ticket-form" onsubmit="return false">
+  <div class="detail-card">
+    <form id="ticket-form" class="ticket-form" onsubmit="return false">
 
-    <!-- Row 1: 티켓번호 | 등록날짜 | WJIRA 결과기재 (outer 3단 그리드 직접 배치) -->
-    <div class="form-group">
-      <label data-i18n="label_ticket_id">티켓번호</label>
-      <div class="ticket-id-row">
-        <div class="ticket-id-wrap" id="ticket-id-edit-wrap">
-          <span class="ticket-prefix">XAX2-</span>
-          <input type="text" id="ticket-id-num" inputmode="numeric" pattern="[0-9]+" placeholder="1234">
+      <!-- 상단 메타 3단: 티켓번호 | 등록날짜 | WJIRA 결과기재 -->
+      <div class="meta-grid">
+        <div class="form-group">
+          <label data-i18n="label_ticket_id">티켓번호</label>
+          <div class="ticket-id-row">
+            <div class="ticket-id-wrap" id="ticket-id-edit-wrap">
+              <span class="ticket-prefix">XAX2-</span>
+              <input type="text" id="ticket-id-num" inputmode="numeric" pattern="[0-9]+" placeholder="1234">
+            </div>
+            <span id="ticket-id-static" class="static-value" style="display:none"></span>
+            <button type="button" id="btn-wjira-link" class="btn btn-secondary" disabled data-i18n="btn_wjira_link">WJIRA 바로가기</button>
+            <button type="button" id="btn-fetch" class="btn btn-secondary" data-i18n="btn_fetch" style="display:none">가져오기</button>
+          </div>
         </div>
-        <span id="ticket-id-static" class="static-value" style="display:none"></span>
-        <button type="button" id="btn-wjira-link" class="btn btn-secondary" disabled data-i18n="btn_wjira_link">바로가기</button>
-        <button type="button" id="btn-fetch" class="btn btn-secondary" data-i18n="btn_fetch" style="display:none">가져오기</button>
+        <div class="form-group">
+          <label data-i18n="label_created_date">등록날짜</label>
+          <span id="created-date" class="static-value">-</span>
+        </div>
+        <div class="form-group">
+          <label data-i18n="label_wjira">WJIRA 결과기재</label>
+          <label class="checkbox-label">
+            <input type="checkbox" id="wjira-updated">
+            <span>OK</span>
+          </label>
+        </div>
       </div>
-    </div>
-    <div class="form-group">
-      <label data-i18n="label_created_date">등록날짜</label>
-      <span id="created-date" class="static-value">-</span>
-    </div>
-    <div class="form-group">
-      <label data-i18n="label_wjira">WJIRA 결과기재</label>
-      <label class="checkbox-label">
-        <input type="checkbox" id="wjira-updated">
-        <span>OK</span>
-      </label>
-    </div>
 
-    <!-- Row 2: 이슈명 -->
-    <div class="form-group form-group-wide">
-      <label data-i18n="label_title">이슈명</label>
-      <div class="input-clearable">
-        <input type="text" id="title-input" data-i18n-placeholder="label_title" placeholder="이슈명">
-        <button type="button" id="btn-clear-title" class="btn-clear-input" style="display:none">×</button>
-      </div>
-    </div>
+      <!-- 구분선 -->
+      <div class="form-divider"></div>
 
-    <!-- Row 3: 3단 그리드 — ticket-form이 1fr 1fr 1fr이므로 자동 배치 -->
-
-    <!-- 1단: 확인버전 (버전1~4 입력란) -->
-    <div class="form-section">
-      <div class="form-section-title" data-i18n="label_check_version">확인버전</div>
+      <!-- 이슈명 -->
       <div class="form-group">
-        <label>버전 1</label>
-        <input type="text" class="version-input" data-version-num="1" data-i18n-placeholder="placeholder_version" placeholder="버전 1">
+        <label data-i18n="label_title">이슈명</label>
+        <div class="input-clearable">
+          <input type="text" id="title-input" data-i18n-placeholder="label_title" placeholder="이슈명">
+          <button type="button" id="btn-clear-title" class="btn-clear-input" style="display:none">×</button>
+        </div>
       </div>
-      <div class="form-group">
-        <label>버전 2</label>
-        <input type="text" class="version-input" data-version-num="2" data-i18n-placeholder="placeholder_version" placeholder="버전 2">
-      </div>
-      <div class="form-group">
-        <label>버전 3</label>
-        <input type="text" class="version-input" data-version-num="3" data-i18n-placeholder="placeholder_version" placeholder="버전 3">
-      </div>
-      <div class="form-group">
-        <label>버전 4</label>
-        <input type="text" class="version-input" data-version-num="4" data-i18n-placeholder="placeholder_version" placeholder="버전 4">
-      </div>
-    </div>
 
-    <!-- 2단: 진행 정보 (담당자·실시순서·진행상태·결과) -->
-    <div class="form-section">
-      <div class="form-section-title" data-i18n="label_progress_info">진행 정보</div>
+      <!-- 구분선 -->
+      <div class="form-divider"></div>
+
+      <!-- 3단 그리드: 확인버전 | 진행 정보 | 버전 이동 -->
+      <div class="detail-3col">
+
+        <!-- 1단: 확인버전 -->
+        <div class="form-section">
+          <div class="form-section-title" data-i18n="label_check_version">확인버전</div>
+          <div class="form-group">
+            <label>버전 1</label>
+            <input type="text" class="version-input" data-version-num="1" data-i18n-placeholder="placeholder_version" placeholder="버전 1">
+          </div>
+          <div class="form-group">
+            <label>버전 2</label>
+            <input type="text" class="version-input" data-version-num="2" data-i18n-placeholder="placeholder_version" placeholder="버전 2">
+          </div>
+          <div class="form-group">
+            <label>버전 3</label>
+            <input type="text" class="version-input" data-version-num="3" data-i18n-placeholder="placeholder_version" placeholder="버전 3">
+          </div>
+          <div class="form-group">
+            <label>버전 4</label>
+            <input type="text" class="version-input" data-version-num="4" data-i18n-placeholder="placeholder_version" placeholder="버전 4">
+          </div>
+        </div>
+
+        <!-- 2단: 진행 정보 -->
+        <div class="form-section">
+          <div class="form-section-title" data-i18n="label_progress_info">진행 정보</div>
+          <div class="form-group">
+            <label data-i18n="label_assignee">담당자</label>
+            <select id="assignee">
+              <option value="">—</option>
+              <option value="정기석">정기석</option>
+              <option value="박수완">박수완</option>
+              <option value="한국">한국</option>
+              <option value="MVN">MVN</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label data-i18n="label_priority">실시순서</label>
+            <select id="priority">
+              <option value="">—</option>
+              <option value="1">1</option>
+              <option value="2">2</option>
+              <option value="3">3</option>
+              <option value="4">4</option>
+              <option value="5">5</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label data-i18n="label_status">진행상태</label>
+            <select id="status">
+              <option value="진행전" data-i18n="status_pending">진행전</option>
+              <option value="진행중" data-i18n="status_active">진행중</option>
+              <option value="재테스트" data-i18n="status_retest">재테스트</option>
+              <option value="완료" data-i18n="status_done_opt">완료</option>
+              <option value="보류" data-i18n="status_hold_opt">보류</option>
+              <option value="N/A" data-i18n="status_na">N/A</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label data-i18n="label_verdict">결과</label>
+            <select id="verdict">
+              <option value="">—</option>
+              <option value="OK">OK</option>
+              <option value="NG">NG</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- 3단: 버전 이동 -->
+        <div class="form-section form-section-top">
+          <div class="form-section-title" data-i18n="label_version_move">버전 이동</div>
+          <div class="form-group" id="version-move-group">
+            <div class="version-move-header">
+              <label>버전 선택</label>
+              <span class="version-badge" id="version-move-badge">미지정</span>
+            </div>
+            <select id="version-move-select"></select>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- 구분선 -->
+      <div class="form-divider"></div>
+
+      <!-- 확인내용 -->
       <div class="form-group">
-        <label data-i18n="label_assignee">담당자</label>
-        <select id="assignee">
-          <option value="">—</option>
-          <option value="정기석">정기석</option>
-          <option value="박수완">박수완</option>
-          <option value="한국">한국</option>
-          <option value="MVN">MVN</option>
-        </select>
+        <label data-i18n="label_check_content">확인내용</label>
+        <textarea id="check-content" data-i18n-placeholder="placeholder_check_content" placeholder="확인내용을 입력하세요"></textarea>
       </div>
+
+      <!-- 파일 첨부 -->
       <div class="form-group">
-        <label data-i18n="label_priority">실시순서</label>
-        <select id="priority">
-          <option value="">—</option>
-          <option value="1">1</option>
-          <option value="2">2</option>
-          <option value="3">3</option>
-          <option value="4">4</option>
-          <option value="5">5</option>
-        </select>
+        <label data-i18n="label_files">파일 첨부</label>
+        <div id="drop-zone" class="drop-zone" data-i18n="drag_drop">파일을 드래그하거나 클릭하여 업로드</div>
+        <input type="file" id="file-input" style="display:none" multiple>
+        <div id="file-list" class="file-list"></div>
       </div>
+
+      <!-- 비고 -->
       <div class="form-group">
-        <label data-i18n="label_status">진행상태</label>
-        <select id="status">
-          <option value="진행전" data-i18n="status_pending">진행전</option>
-          <option value="진행중" data-i18n="status_active">진행중</option>
-          <option value="재테스트" data-i18n="status_retest">재테스트</option>
-          <option value="완료" data-i18n="status_done_opt">완료</option>
-          <option value="보류" data-i18n="status_hold_opt">보류</option>
-          <option value="N/A" data-i18n="status_na">N/A</option>
-        </select>
+        <label data-i18n="label_note">비고</label>
+        <textarea id="note" data-i18n-placeholder="placeholder_note" placeholder="비고를 입력하세요"></textarea>
       </div>
-      <div class="form-group">
-        <label data-i18n="label_verdict">결과</label>
-        <select id="verdict">
-          <option value="">—</option>
-          <option value="OK">OK</option>
-          <option value="NG">NG</option>
-        </select>
-      </div>
-    </div>
 
-    <!-- 3단: 버전 이동 (내용이 적으므로 상단 정렬) -->
-    <div class="form-section form-section-top">
-      <div class="form-section-title" data-i18n="label_version_move">버전 이동</div>
-      <div class="form-group" id="version-move-group">
-        <label id="version-move-current" class="version-move-info">현재: 미지정</label>
-        <select id="version-move-select"></select>
-      </div>
-    </div>
-
-    <!-- Row 4: 확인내용 -->
-    <div class="form-group form-group-wide">
-      <label data-i18n="label_check_content">확인내용</label>
-      <textarea id="check-content" rows="6" data-i18n-placeholder="placeholder_check_content" placeholder="확인내용을 입력하세요"></textarea>
-    </div>
-
-    <!-- 파일 첨부 -->
-    <div class="form-group form-group-wide">
-      <label data-i18n="label_files">파일 첨부</label>
-      <div id="drop-zone" class="drop-zone" data-i18n="drag_drop">파일을 드래그하거나 클릭하여 업로드</div>
-      <input type="file" id="file-input" style="display:none" multiple>
-      <div id="file-list" class="file-list"></div>
-    </div>
-
-    <!-- 비고 -->
-    <div class="form-group form-group-wide">
-      <label data-i18n="label_note">비고</label>
-      <textarea id="note" rows="3" data-i18n-placeholder="placeholder_note" placeholder="비고를 입력하세요"></textarea>
-    </div>
-
-  </form>
-
+    </form>
+  </div>
 </main>
 
 <script src="js/i18n.js"></script>

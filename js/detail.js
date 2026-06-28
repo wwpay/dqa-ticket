@@ -229,7 +229,7 @@ function renderVersionSelect(selectedId) {
 
 // 레이블 옆 "현재: 버전명" 텍스트 갱신 (버전 없으면 "미지정")
 function updateCurrentVersionLabel(versionId) {
-  const badge = document.getElementById('version-move-current');
+  const badge = document.getElementById('version-move-badge');
   if (!badge) return;
   const v = allVersions.find(v => v.version_id === versionId);
   badge.textContent = `현재: ${v ? v.version_name : '미지정'}`;
