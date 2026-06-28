@@ -1,3 +1,4 @@
+/* 수정: 2026-06-28 19:30 — 헤더 필터 뱃지 UI (.th-content/.th-filter-badge/.th-filter-clear) */
 /* 수정: 2026-06-28 19:00 — 그룹헤더 mid 배경, 섹션별 th 색상 계열 연동, 보류&N/A */
 /* 수정: 2026-06-28 18:30 — DnD 드래그핸들 CSS 제거 (.drag-handle/.draggable-row/.priority-num) */
 /* 수정: 2026-06-28 18:00 — 헤더 행 스타일 개선: --text-secondary, 11px/500/0.04em/6px 14px */
@@ -266,6 +267,50 @@ body {
   pointer-events: none;
 }
 .th-filter-wrap.active .th-filter-label { font-weight: 700; }
+
+/* 필터 th 내부 컨테이너: 컬럼명 + 뱃지를 세로로 쌓음 */
+.th-content {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+}
+
+/* 활성 필터 뱃지 */
+.th-filter-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  font-size: 10px;
+  font-weight: 600;
+  color: inherit;
+  border: 1px solid currentColor;
+  padding: 0 5px;
+  border-radius: 10px;
+  max-width: 90%;
+  line-height: 1.7;
+  text-transform: none;
+  letter-spacing: 0;
+  pointer-events: auto; /* 셀렉트 오버레이 바깥에 위치해 클릭 가능 */
+}
+.th-badge-text {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 65px;
+}
+.th-filter-clear {
+  border: none;
+  background: none;
+  cursor: pointer;
+  color: inherit;
+  font-size: 13px;
+  padding: 0;
+  line-height: 1;
+  font-family: inherit;
+  flex-shrink: 0;
+}
+.th-filter-clear:hover { opacity: 0.6; }
 
 .th-filter-select {
   position: absolute;

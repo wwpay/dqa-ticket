@@ -1,3 +1,4 @@
+// 수정: 2026-06-28 19:30 — 헤더 필터 뱃지 버그 수정: 컬럼명 항상 유지, 활성 필터는 × 뱃지 표시
 // 수정: 2026-06-28 14:00 — 실시순서 Rule4: 같은 그룹+버전 필터, 연속된 번호만 cascade (빈칸에서 중지)
 // 수정: 2026-06-28 10:00 — loadVersions 제거, loadTickets에서 versions 포함 처리
 // 티켓 데이터 캐시
@@ -49,7 +50,18 @@ document.addEventListener('DOMContentLoaded', async () => {
     const key = e.target.dataset.filterKey;
     const value = e.target.value;
     activeFilters[key] = value;
-    // 모든 섹션 헤더 재빌드 (동기화 + active 상태 반영)
+    buildAllHeaders();
+    populateDynamicFilters();
+    renderAll();
+  });
+
+  // 헤더 필터 초기화(×) 버튼 이벤트 위임
+  document.addEventListener('click', (e) => {
+    const btn = e.target.closest('.th-filter-clear');
+    if (!btn) return;
+    const key = btn.dataset.filterKey;
+    activeFilters[key] = '';
+    document.querySelectorAll(`.th-filter-select[data-filter-key="${key}"]`).forEach(s => { s.value = ''; });
     buildAllHeaders();
     populateDynamicFilters();
     renderAll();
@@ -87,22 +99,31 @@ function buildHeaderHtml(sectionType = 'active') {
     ? `<option value="보류"${sel('status','보류')}>${statusLabel('보류')}</option><option value="N/A"${sel('status','N/A')}>N/A</option>`
     : `<option value="진행중"${sel('status','진행중')}>${statusLabel('진행중')}</option><option value="진행전"${sel('status','진행전')}>${statusLabel('진행전')}</option><option value="재테스트"${sel('status','재테스트')}>${statusLabel('재테스트')}</option>`;
 
-  const wrap = (key, label, activeVal, inner, displayVal) =>
-    `<span class="th-filter-wrap${activeVal ? ' active' : ''}">` +
-    `<span class="th-filter-label">${activeVal ? escHtml(displayVal || activeVal) : label}</span>` +
-    `<select class="th-filter-select" data-filter-key="${key}">${inner}</select>` +
-    `</span>`;
+  // 컬럼명은 항상 유지, 활성 필터는 하단 뱃지(× 포함)로 표시
+  const wrap = (key, label, inner, displayVal) => {
+    const active = !!f[key];
+    const badgeText = escHtml(displayVal || f[key]);
+    const badge = active
+      ? `<span class="th-filter-badge"><span class="th-badge-text">${badgeText}</span>` +
+        `<button class="th-filter-clear" data-filter-key="${key}" type="button">×</button></span>`
+      : '';
+    return `<span class="th-content">` +
+      `<span class="th-filter-wrap${active ? ' active' : ''}">` +
+      `<span class="th-filter-label">${label}</span>` +
+      `<select class="th-filter-select" data-filter-key="${key}">${inner}</select>` +
+      `</span>${badge}</span>`;
+  };
 
   return `
     <th></th>
     <th>${t('col_ticket_id')}</th>
     <th>${t('col_title')}</th>
-    <th>${wrap('version', t('col_check_version'), f.version, `<option value=""></option>`)}</th>
+    <th>${wrap('version', t('col_check_version'), `<option value=""></option>`)}</th>
     <th>${t('col_order')}</th>
-    <th>${wrap('assignee', t('col_assignee'), f.assignee, `<option value=""></option>`)}</th>
-    <th>${wrap('status', t('col_status'), f.status, `<option value=""></option>${statusOpts}`, f.status ? statusLabel(f.status) : '')}</th>
-    <th>${wrap('verdict', t('col_verdict'), f.verdict, `<option value=""></option><option value="OK"${sel('verdict','OK')}>OK</option><option value="NG"${sel('verdict','NG')}>NG</option>`)}</th>
-    <th>${wrap('wjira', 'WJIRA 결과기재', f.wjira, `<option value=""></option><option value="OK"${sel('wjira','OK')}>기재완료</option><option value="none"${sel('wjira','none')}>미기재</option>`)}</th>
+    <th>${wrap('assignee', t('col_assignee'), `<option value=""></option>`)}</th>
+    <th>${wrap('status', t('col_status'), `<option value=""></option>${statusOpts}`, f.status ? statusLabel(f.status) : '')}</th>
+    <th>${wrap('verdict', t('col_verdict'), `<option value=""></option><option value="OK"${sel('verdict','OK')}>OK</option><option value="NG"${sel('verdict','NG')}>NG</option>`)}</th>
+    <th>${wrap('wjira', 'WJIRA 결과기재', `<option value=""></option><option value="OK"${sel('wjira','OK')}>기재완료</option><option value="none"${sel('wjira','none')}>미기재</option>`, f.wjira === 'OK' ? '기재완료' : f.wjira === 'none' ? '미기재' : '')}</th>
   `;
 }
 
