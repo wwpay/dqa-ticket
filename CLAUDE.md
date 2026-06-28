@@ -192,6 +192,7 @@
 
 | 날짜 | 변경 내용 |
 |------|-----------|
+| 2026-06-28 | 메인 콘텐츠 max-width/margin 제거, padding 축소, 테이블 min-width 750px, 전체 폭 채움 |
 | 2026-06-28 | 티켓 테이블 min-width:950px, 각 컬럼 최소 너비 조정, 가로 스크롤 적용 |
 | 2026-06-28 | index.html/versions.html 로딩 오버레이 스타일 통일 (detail-loading-overlay + "로딩 중..." 텍스트) |
 | 2026-06-28 | 로딩 오버레이 즉시 표시, doGet versions 포함 반환, API 호출 2회→1회 감소 |

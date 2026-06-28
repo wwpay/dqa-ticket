@@ -1,4 +1,4 @@
-/* 수정: 2026-06-28 11:00 — 티켓 테이블 min-width 950px, 각 컬럼 최소 너비 조정 */
+/* 수정: 2026-06-28 11:30 — 메인 콘텐츠 max-width/margin 제거, padding 축소, 테이블 min-width 750px */
 /* ─── CSS 변수 ───────────────────────────────────────────────────────────── */
 :root {
   --ww:          #2563eb;
@@ -428,9 +428,7 @@ body {
 .main-content {
   flex: 1;
   min-width: 0;
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 20px 24px;
+  padding: 16px 8px;
   background: var(--surface-2);
 }
 
@@ -502,7 +500,7 @@ body {
 /* ─── 테이블 ──────────────────────────────────────────────────────────────── */
 .ticket-table {
   width: 100%;
-  min-width: 950px;
+  min-width: 750px;
   border-collapse: collapse;
   font-size: 13px;
   table-layout: fixed;
@@ -992,7 +990,6 @@ body {
   .topbar { padding: 0 14px; gap: 8px; }
   .app-title { font-size: 15px; }
   .search-input { width: 130px; }
-  .main-content { padding: 12px 14px; }
 
   .ticket-table { font-size: 12px; }
   .ticket-table th, .ticket-table td { padding: 7px 8px; }
