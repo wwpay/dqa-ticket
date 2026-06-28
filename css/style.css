@@ -1,3 +1,4 @@
+/* 수정: 2026-06-28 18:30 — DnD 드래그핸들 CSS 제거 (.drag-handle/.draggable-row/.priority-num) */
 /* 수정: 2026-06-28 18:00 — 헤더 행 스타일 개선: --text-secondary, 11px/500/0.04em/6px 14px */
 /* 수정: 2026-06-28 16:00 — 테이블 헤더 스타일 개선, DnD 드래그핸들 스타일 추가 */
 /* 수정: 2026-06-28 12:00 — th overflow:hidden 추가, min-width 800px */
@@ -663,27 +664,6 @@ body {
 }
 .inline-select:hover { border-color: var(--border); }
 .inline-select:focus { outline: none; border-color: var(--ww); box-shadow: 0 0 0 2px #dbeafe; }
-
-/* 실시순서 — 드래그앤드롭 핸들 */
-.drag-handle {
-  display: inline-block;
-  cursor: grab;
-  color: var(--muted);
-  font-size: 15px;
-  opacity: 0.3;
-  margin-right: 5px;
-  vertical-align: middle;
-  user-select: none;
-  line-height: 1;
-}
-.draggable-row:hover .drag-handle { opacity: 0.75; }
-.draggable-row.dragging { opacity: 0.4; background: var(--ww-light) !important; }
-
-/* 실시순서 숫자 */
-.priority-num { font-size: 12px; font-weight: 700; vertical-align: middle; }
-.priority-num.order-1 { color: var(--p1); }
-.priority-num.order-2 { color: var(--p2); }
-.priority-num.order-3 { color: var(--p3); }
 
 /* 진행상태 색상 */
 .status-select.status-active  { background-color: #dbeafe; color: #1d4ed8; }
