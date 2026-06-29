@@ -1,3 +1,4 @@
+/* 수정: 2026-06-29 — 인라인 셀렉트 모양을 등록폼 셀렉트와 통일 (사각 6px + 테두리), 색상/효과 유지 */
 /* 수정: 2026-06-29 — 진행중 행은 셀 개별 hover 제거, 행 전체 진한 노랑 hover만 적용 */
 /* 수정: 2026-06-29 — 드래그 드롭 위치 녹색 인디케이터(.drop-above/.drop-below) 추가 */
 /* 수정: 2026-06-29 — 담당자/진행상태 컬럼 폭 확대(110/120px)로 셀렉트 간 간격 확보, min-width 940px */
@@ -789,8 +790,8 @@ body {
 .inline-select {
   appearance: none;
   -webkit-appearance: none;
-  border: 1px solid transparent;
-  border-radius: 10px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
   padding: 2px 20px 2px 8px;
   font-size: 12px;
   font-family: inherit;
@@ -804,7 +805,7 @@ body {
   white-space: nowrap;
   transition: border-color 0.12s;
 }
-.inline-select:hover { border-color: var(--border); }
+.inline-select:hover { border-color: var(--text-muted); }
 .inline-select:focus { outline: none; border-color: var(--ww); box-shadow: 0 0 0 2px #dbeafe; }
 
 /* 진행상태 색상 */
