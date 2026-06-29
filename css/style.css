@@ -1,3 +1,4 @@
+/* 수정: 2026-06-29 — 진행중 행은 셀 개별 hover 제거, 행 전체 진한 노랑 hover만 적용 */
 /* 수정: 2026-06-29 — 드래그 드롭 위치 녹색 인디케이터(.drop-above/.drop-below) 추가 */
 /* 수정: 2026-06-29 — 담당자/진행상태 컬럼 폭 확대(110/120px)로 셀렉트 간 간격 확보, min-width 940px */
 /* 수정: 2026-06-29 — 진행상태 셀 status-cell 클래스화, 왼쪽 패딩 14px로 담당자와 간격 확보 */
@@ -650,6 +651,11 @@ body {
 .navigate-cell:hover {
   background: #f0f7ff;
   color: var(--ww);
+}
+/* 진행중 행은 행 전체 hover(진한 노랑)만 적용, 셀 개별 hover 효과는 제거 */
+.ticket-table tr.row-active .navigate-cell:hover {
+  background: transparent;
+  color: inherit;
 }
 .ticket-table tr.dimmed { opacity: 0.65; }
 
