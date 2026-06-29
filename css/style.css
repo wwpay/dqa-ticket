@@ -633,8 +633,8 @@ body {
 .ticket-table tr[data-row-id]:hover { background: #f8fafc; }
 
 /* 진행중 행 강조 */
-.ticket-table tr.row-active { background: #fffbeb; border-left: 3px solid #f59e0b; }
-.ticket-table tr.row-active:hover { background: #fef3c7; }
+.ticket-table tr.row-active { background: #fef3c7; border-left: 3px solid #f59e0b; }
+.ticket-table tr.row-active:hover { background: #fde68a; }
 
 /* 이슈명·확인버전 셀만 클릭 커서 + hover 강조 */
 .navigate-cell {
