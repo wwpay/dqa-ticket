@@ -1,3 +1,4 @@
+// 수정: 2026-06-29 — 편집 잠금 폴링 추가 (20초 주기, 아이콘만 갱신, 비활성 탭 스킵)
 // 수정: 2026-06-29 — 드래그 드롭 위치 녹색 인디케이터 줄 추가 (drop-above/drop-below)
 // 수정: 2026-06-29 — 드래그 핸들 실제 동작 수정 (mousedown 시 draggable 토글, tr 고정 draggable 제거)
 // 수정: 2026-06-29 — 실시순서 드롭다운 복구(드래그 핸들 병행), 그룹 이동 시 priority 초기화로 중복 방지
@@ -55,6 +56,8 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   setupDragDrop(document.getElementById('tbody-activeWW'),  'activeWW');
   setupDragDrop(document.getElementById('tbody-activeMVN'), 'activeMVN');
+
+  startLockPolling();  // 다른 사용자의 편집 잠금을 주기적으로 반영 (아이콘만 갱신)
 
   document.getElementById('btn-new').addEventListener('click', () => {
     const vid = currentVersionId && currentVersionId !== ALL_VERSION ? '?version_id=' + encodeURIComponent(currentVersionId) : '';
@@ -688,6 +691,56 @@ function setupDragDrop(tbody, group) {
     // 변경된 항목만 GAS에 저장
     if (updates.length) {
       await Promise.all(updates.map(u => updateTicket(u).catch(console.error)));
+    }
+  });
+}
+
+// ─── 편집 잠금 폴링 (다른 사용자의 잠금을 아이콘만 갱신) ─────────────────────────
+// 전체 재렌더 없이 .lock-icon만 추가/제거하므로 열린 드롭다운·선택·드래그를 방해하지 않음.
+
+const LOCK_POLL_MS = 20000;        // 20초 주기
+const LOCK_EXPIRE_MS = 30 * 60 * 1000;
+let lockPollTimer = null;
+
+function startLockPolling() {
+  if (lockPollTimer) clearInterval(lockPollTimer);
+  lockPollTimer = setInterval(refreshLockIcons, LOCK_POLL_MS);
+  // 탭이 다시 활성화되면 즉시 한 번 갱신
+  document.addEventListener('visibilitychange', () => {
+    if (!document.hidden) refreshLockIcons();
+  });
+}
+
+async function refreshLockIcons() {
+  if (document.hidden) return;     // 비활성 탭에서는 GAS 호출 생략
+  let data;
+  try {
+    data = await getTickets(currentVersionId === ALL_VERSION ? '' : currentVersionId);
+  } catch (_) {
+    return;                         // 폴링 실패는 조용히 무시 (다음 주기에 재시도)
+  }
+
+  const all = [...data.activeWW, ...data.activeMVN, ...data.done, ...data.hold];
+  const lockedMap = new Map(all.map(tk => [tk.row_id, tk.locked_at]));
+  const now = Date.now();
+
+  document.querySelectorAll('tr[data-row-id]').forEach(tr => {
+    const rowId = tr.dataset.rowId;
+    if (!lockedMap.has(rowId)) return;
+    const lockedAt = lockedMap.get(rowId);
+    const isLocked = !!lockedAt && (now - new Date(lockedAt).getTime()) < LOCK_EXPIRE_MS;
+
+    // 캐시에도 반영해 두어 이후 renderAll() 시 아이콘이 되돌아가지 않게 함
+    const cached = allTicketsFlat().find(tk => tk.row_id === rowId);
+    if (cached) cached.locked_at = lockedAt || '';
+
+    const cell = tr.querySelector('.ticket-id-cell');
+    if (!cell) return;
+    const existing = cell.querySelector('.lock-icon');
+    if (isLocked && !existing) {
+      cell.insertAdjacentHTML('afterbegin', '<span class="lock-icon" title="편집 중">🔒</span>');
+    } else if (!isLocked && existing) {
+      existing.remove();
     }
   });
 }
