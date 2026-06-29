@@ -1,3 +1,4 @@
+/* 수정: 2026-06-29 — 담당자/진행상태 셀렉트 최소 폭 및 여백 확보 */
 /* 수정: 2026-06-29 — 기본 탭 최신 버전으로 변경, 컬럼 폭 조정 및 가로 스크롤 제거 (min-width 870px) */
 /* 수정: 2026-06-29 — 드래그 핸들 스타일 복구 (.drag-handle-cell/.drag-handle/.draggable-row/.priority-num) */
 /* 수정: 2026-06-29 — 편집 잠금 배너(.lock-banner) 및 목록 잠금 아이콘(.lock-icon) 스타일 추가 */
@@ -754,8 +755,12 @@ body {
 .clip-cell { text-align: center; padding: 0 2px; line-height: 0; }
 
 /* ─── 담당자 셀 ───────────────────────────────────────────────────────────── */
-.assignee-cell { white-space: nowrap; }
-.assignee-select { min-width: 80px; }
+.assignee-cell { white-space: nowrap; padding-left: 4px; padding-right: 4px; }
+.assignee-select { min-width: 70px; }
+
+/* 진행상태 셀: 좁은 컬럼에서 셀렉트 여백 확보 */
+.ticket-table td:has(.status-select) { padding-left: 4px; padding-right: 4px; }
+.status-select { min-width: 80px; }
 
 /* ─── WJIRA 체크박스 셀 ────────────────────────────────────────────────────── */
 .wjira-cell { text-align: center; }
