@@ -1,3 +1,4 @@
+// 수정: 2026-06-29 — 담당자/진행상태 컬럼 폭 확대(110/120px)로 셀렉트 간 간격 확보
 // 수정: 2026-06-29 — 기본 탭 최신 버전으로 변경, 컬럼 폭 조정 및 가로 스크롤 제거
 // 수정: 2026-06-29 — COL_WIDTHS 컬럼 폭 조정 (핸들 추가 후 레이아웃 균형)
 // 수정: 2026-06-29 — 드래그 핸들 기능 복구 (setupDragDrop, drag-handle-cell, priority-num span)
@@ -98,7 +99,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 // 컬럼 너비: 클립 | 티켓번호 | 이슈명(flex) | 확인버전 | 실시순서 | 담당자 | 진행상태 | 판정 | WJIRA
 // 이슈명은 테이블 min-width(950px)에서 고정 컬럼 합(684px)을 뺀 나머지를 자동 배분 (≥266px 보장)
-const COL_WIDTHS = ['24px', '110px', '', '110px', '70px', '80px', '90px', '60px', '80px', '44px'];
+const COL_WIDTHS = ['24px', '110px', '', '110px', '70px', '110px', '120px', '70px', '80px', '44px'];
 // 클립 | 티켓번호 | 이슈명(flex) | 확인버전 | 실시순서 | 담당자 | 진행상태 | 판정 | WJIRA | 핸들
 
 function buildAllHeaders() {
