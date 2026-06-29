@@ -6,6 +6,7 @@
 /* 수정: 2026-06-29 — 담당자/진행상태 셀렉트 최소 폭 및 여백 확보 */
 /* 수정: 2026-06-29 — 기본 탭 최신 버전으로 변경, 컬럼 폭 조정 및 가로 스크롤 제거 (min-width 870px) */
 /* 수정: 2026-06-29 — 드래그 핸들 스타일 복구 (.drag-handle-cell/.drag-handle/.draggable-row/.priority-num) */
+/* 수정: 2026-06-30 — 잠긴 행 인라인 컨트롤 비활성 표시(.locked-row) 추가 */
 /* 수정: 2026-06-30 — 툴팁을 native title 풍(옅은 노랑+테두리)으로, 행 전체 hover 강조로 통일 */
 /* 수정: 2026-06-30 — 커스텀 툴팁(.app-tooltip) 추가: 요소 위쪽 표시로 커서가 글씨 안 가림 */
 /* 수정: 2026-06-30 — 자물쇠 아이콘 위 커서 화살표 유지 (cursor:default, user-select:none) */
@@ -738,6 +739,11 @@ body {
 }
 .drag-handle:hover { color: var(--text-primary); }
 .draggable-row.dragging { opacity: 0.4; background: var(--ww-light) !important; }
+
+/* 편집 잠금 행: 인라인 컨트롤 변경 불가 — 핸들 숨김 + 비활성 표시 */
+.locked-row .drag-handle { display: none; }
+.locked-row .inline-select,
+.locked-row .wjira-checkbox { cursor: not-allowed; opacity: 0.55; }
 
 /* 드롭 위치 인디케이터 (진한 녹색 줄) */
 .ticket-table tr.drop-above td { box-shadow: inset 0 3px 0 #15803d; }

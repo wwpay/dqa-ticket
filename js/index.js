@@ -1,3 +1,4 @@
+// 수정: 2026-06-30 — 잠긴 항목은 목록 인라인 컨트롤(순서/담당자/상태/결과/WJIRA/핸들)도 변경 불가 처리
 // 수정: 2026-06-30 — 이슈명도 커스텀 툴팁(data-tip)으로 전환
 // 수정: 2026-06-30 — 클립/자물쇠 툴팁을 요소 위쪽 커스텀 툴팁(data-tip)으로 변경 (커서가 글씨 안 가림)
 // 수정: 2026-06-29 — 클립(첨부 대표 파일명)·자물쇠(편집중) title 툴팁 추가
@@ -378,6 +379,8 @@ function buildRow(ticket, dimmed, group) {
   const verdictClass = ticket.verdict === 'OK' ? 'verdict-ok' : ticket.verdict === 'NG' ? 'verdict-ng' : '';
   const hasFiles = ticket.file_urls && ticket.file_urls.trim();
   const isActive = ['진행중', '진행전', '재테스트'].includes(ticket.status);
+  const locked = isLockedForDisplay(ticket); // 다른 사용자가 편집 중 → 인라인 변경 차단
+  const dis = locked ? ' disabled' : '';
 
   // 활성 행: 실시순서 드롭다운(+ 핸들 드래그로도 변경 가능), 완료/보류: — 표시
   const activeCount = allTickets.activeWW.length + allTickets.activeMVN.length;
@@ -387,13 +390,14 @@ function buildRow(ticket, dimmed, group) {
         const opts = ['', ...Array.from({length: maxOrder}, (_, i) => String(i + 1))].map(v =>
           `<option value="${v}"${pri === v ? ' selected' : ''}>${v || '—'}</option>`
         ).join('');
-        return `<select class="inline-select order-select ${orderClass}" data-field="priority" data-row-id="${escHtml(ticket.row_id)}">${opts}</select>`;
+        return `<select class="inline-select order-select ${orderClass}" data-field="priority" data-row-id="${escHtml(ticket.row_id)}"${dis}>${opts}</select>`;
       })()
     : `<span class="order-dash">—</span>`;
 
-  // row-active(진행중 강조) + draggable-row(DnD 대상) + dimmed 조합
+  // row-active(진행중 강조) + draggable-row(DnD 대상) + dimmed + locked-row(편집중 잠금) 조합
   const rowClass = [
-    isActive ? 'draggable-row' : '',
+    isActive && !locked ? 'draggable-row' : '',
+    locked ? 'locked-row' : '',
     dimmed ? 'dimmed' : (ticket.status === '진행중' ? 'row-active' : '')
   ].filter(Boolean).join(' ');
 
@@ -425,10 +429,10 @@ function buildRow(ticket, dimmed, group) {
       <td class="title-cell navigate-cell"${ticket.title ? ` data-tip="${escHtml(ticket.title)}"` : ''}>${escHtml(ticket.title)}</td>
       <td class="navigate-cell version-cell">${versionHtml}</td>
       <td>${orderCell}</td>
-      <td class="assignee-cell">${buildAssigneeSelectHtml(ticket.assignee || '', ticket.row_id)}</td>
-      <td class="status-cell"><select class="inline-select status-select ${statusClass}" data-field="status" data-row-id="${escHtml(ticket.row_id)}">${statusOptions}</select></td>
-      <td><select class="inline-select verdict-select ${verdictClass}" data-field="verdict" data-row-id="${escHtml(ticket.row_id)}">${verdictOptions}</select></td>
-      <td class="wjira-cell"><input type="checkbox" class="wjira-checkbox" data-field="wjira_updated" data-row-id="${escHtml(ticket.row_id)}"${wjiraChecked}></td>
+      <td class="assignee-cell">${buildAssigneeSelectHtml(ticket.assignee || '', ticket.row_id, locked)}</td>
+      <td class="status-cell"><select class="inline-select status-select ${statusClass}" data-field="status" data-row-id="${escHtml(ticket.row_id)}"${dis}>${statusOptions}</select></td>
+      <td><select class="inline-select verdict-select ${verdictClass}" data-field="verdict" data-row-id="${escHtml(ticket.row_id)}"${dis}>${verdictOptions}</select></td>
+      <td class="wjira-cell"><input type="checkbox" class="wjira-checkbox" data-field="wjira_updated" data-row-id="${escHtml(ticket.row_id)}"${wjiraChecked}${dis}></td>
       <td class="drag-handle-cell">${isActive ? `<span class="drag-handle" title="드래그하여 순서 변경">⠿</span>` : ''}</td>
     </tr>`;
 }
@@ -442,7 +446,7 @@ function updateCounts() {
 
 // ─── 담당자 셀 ────────────────────────────────────────────────────────────────
 
-function buildAssigneeSelectHtml(av, rowId) {
+function buildAssigneeSelectHtml(av, rowId, locked = false) {
   const isPreset = PRESET_ASSIGNEES.includes(av);
   const isLegacy = LEGACY_ASSIGNEES.includes(av);
   const showCustom = av !== '' && !isPreset && !isLegacy;
@@ -452,7 +456,7 @@ function buildAssigneeSelectHtml(av, rowId) {
   ).join('');
   if (showCustom) opts += `<option value="${escHtml(av)}" selected>${escHtml(av)}</option>`;
   opts += `<option value="__custom__">직접입력...</option>`;
-  return `<select class="inline-select assignee-select" data-field="assignee" data-row-id="${escHtml(rowId)}">${opts}</select>`;
+  return `<select class="inline-select assignee-select" data-field="assignee" data-row-id="${escHtml(rowId)}"${locked ? ' disabled' : ''}>${opts}</select>`;
 }
 
 function activateCustomAssignee(select) {
@@ -531,6 +535,13 @@ async function handleInlineChange(e) {
     if (found) { ticket = found; currentGroup = group; break; }
   }
   if (!ticket) return;
+
+  // 안전망: 다른 사용자가 편집 중인 항목은 인라인 변경 차단 (disabled 우회/레이스 대비)
+  if (isLockedForDisplay(ticket)) {
+    alert('다른 사용자가 편집 중인 항목입니다.\n편집이 완료된 후 다시 시도해 주세요.');
+    renderAll();
+    return;
+  }
 
   // ── 실시순서: 같은 그룹+버전 기준 중복 확인 + 연속된 번호만 cascade (Rule 4) ──
   if (field === 'priority') {
@@ -777,7 +788,21 @@ async function refreshLockIcons() {
     } else if (!isLocked && existing) {
       existing.remove();
     }
+
+    // 잠금 상태에 따라 인라인 컨트롤 변경 가능 여부도 함께 토글
+    setRowLockedState(tr, isLocked);
   });
+}
+
+// 행의 인라인 컨트롤(셀렉트/체크박스/드래그) 변경 가능 여부 토글
+function setRowLockedState(tr, locked) {
+  tr.classList.toggle('locked-row', locked);
+  // 잠긴 행은 드래그 대상에서 제외 (드래그 핸들은 CSS로 숨김)
+  if (locked) tr.classList.remove('draggable-row');
+  else if (['진행중', '진행전', '재테스트'].some(s => tr.querySelector('.status-select')?.value === s)) {
+    tr.classList.add('draggable-row');
+  }
+  tr.querySelectorAll('.inline-select, .wjira-checkbox').forEach(el => { el.disabled = locked; });
 }
 
 // ─── 커스텀 툴팁 ([data-tip] 요소 위쪽 표시, table-scroll 클리핑 회피) ───────────
